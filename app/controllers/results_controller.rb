@@ -19,7 +19,10 @@ class ResultsController < ApplicationController
   # GET /results.json
   def index
     @results = Result.all
+    @graphs = Result.all.group_by(&:name)
+    @graphs = @graphs.each { |k,v| a[k] = v.map{|result| result[:likes]}}
   end
+
 
   # GET /results/1
   # GET /results/1.json
