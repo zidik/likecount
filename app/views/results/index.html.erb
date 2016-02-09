@@ -2,7 +2,7 @@
 <%= javascript_include_tag "//www.google.com/jsapi", "chartkick" %>
 </head>
 <p id="notice"><%= notice %></p>
-<%= line_chart @graphs %>
+<%= line_chart @graphs, min: 1800 %>
 
 <h1>Listing Results</h1>
 

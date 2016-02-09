@@ -19,8 +19,11 @@ class ResultsController < ApplicationController
   # GET /results.json
   def index
     @results = Result.all
-    @graphs = Result.all.group_by(&:name)
-    @graphs = @graphs.each { |k,v| a[k] = v.map{|result| result[:likes]}}
+    a = Result.all.group_by(&:name)
+	    
+@graphs = []
+ a.each{|k,v| @graphs.append({name: k, data: v.map{|r| [r[:created_at], r[:likes]]}.to_h })}
+
   end
 
 
