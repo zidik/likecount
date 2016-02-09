@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     collection do
       get "get_new_results"
       get "save_results"
+      get "likes"
     end
   end
   # The priority is based upon order of creation: first created -> highest priority.
