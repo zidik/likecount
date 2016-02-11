@@ -109,6 +109,15 @@ class ResultsController < ApplicationController
     @today_delta_graph = (take_points 100, @today_delta_graph)
     @all_delta_graph = (take_points 100, @all_delta_graph)
 
+    def sort_graph_data graph
+      graph.map{ |h| {
+          name: h[:name],
+          data: h[:data].sort.to_h
+      } }
+    end
+
+    @today_delta_graph = sort_graph_data @today_delta_graph
+
     @today_graph.sort_by! { |h| h[:name] }
     @all_graph.sort_by! { |h| h[:name] }
     @today_delta_graph.sort_by! { |h| h[:name] }
