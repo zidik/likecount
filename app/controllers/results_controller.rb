@@ -33,8 +33,15 @@ class ResultsController < ApplicationController
     all = Result.all.group_by(&:name)
     @today_graph = []
     @all_graph = []     
-    today.each{|k,v| @today_graph.append({name: k, data: v.every_nth(v.count/100+1).map{|r| [r[:created_at], r[:likes]]}.to_h })}
-    all  .each{|k,v| @all_graph  .append({name: k, data: v.every_nth(v.count/100+1).map{|r| [r[:created_at], r[:likes]]}.to_h })}
+    today.each{|k,v| @today_graph.append({name: k, data: v.every_nth([v.count/100,1].max).map{|r| [r[:created_at], r[:likes]]}.to_h })}
+    all  .each{|k,v| @all_graph  .append({name: k, data: v.every_nth([v.count/100,1].max).map{|r| [r[:created_at], r[:likes]]}.to_h })}
+    @today_delta_graph = @today_graph.map{|s| {name: s[:name], data: s[:data].zip(12.times.map{|i| [i,s[:data].values[0]]}.to_h.merge(s[:data])).map{|pair| [pair[0][0], pair[0][1]- ((pair[0][1] if pair[1][1].nil?) || pair [1][1])] }.to_h} }
+    @all_delta_graph = @all_graph.map{|s| {name: s[:name], data: s[:data].zip(12.times.map{|i| [i,s[:data].values[0]]}.to_h.merge(s[:data])).map{|pair| [pair[0][0], pair[0][1]- ((pair[0][1] if pair[1][1].nil?) || pair [1][1])] }.to_h} }
+    
+    @today_graph.sort_by! { |hsh| hsh[:name] }
+    @all_graph.sort_by! { |hsh| hsh[:name] }
+    @today_delta_graph.sort_by! { |hsh| hsh[:name] }
+    @all_delta_graph.sort_by! { |hsh| hsh[:name] }
   end
 
 

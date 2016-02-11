@@ -4,6 +4,13 @@
 </head>
 <h1>Laigid</h1>
 <h2>Viimased 24h</h2>
+<h3>Kumulatiivne</h3>
 <%= line_chart @today_graph, min: nil %>
+<h3>Laike tunnis</h3>
+<%= line_chart @today_delta_graph %>
+
 <h2>Kogu periood</h2>
+<h3>Kumulatiivne</h3>
 <%= line_chart @all_graph %>
+<h3>Laike tunnis</h3>
+<%= line_chart @all_delta_graph %>
