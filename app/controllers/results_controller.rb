@@ -102,7 +102,7 @@ class ResultsController < ApplicationController
       graph.map{ |h| {
           name: h[:name],
           data: (0... h[:data].length)
-                  .zip(h[:data]).select{|i, v| i%nth==h[:data].length-1}.map(&:second).to_h
+                  .zip(h[:data]).select{|i, v| i%nth==nth-1}.map(&:second).to_h
       } }
     end
 
