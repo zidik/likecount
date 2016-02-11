@@ -1,3 +1,9 @@
+module Enumerable
+  def every_nth(n)
+    (0... self.length).select{ |x| x%n == n-1 }.map { |y| self[y] }
+  end
+end 
+
 require 'open-uri'
 class ResultsController < ApplicationController
   before_action :set_result, only: [:show, :edit, :update, :destroy]
@@ -23,9 +29,12 @@ class ResultsController < ApplicationController
   end
 
   def likes
-    a = Result.all.group_by(&:name)
-    @graphs = []
-    a.each{|k,v| @graphs.append({name: k, data: v.map{|r| [r[:created_at], r[:likes]]}.to_h })}
+    today = Result.where(created_at: (Time.now - 1.day)..Time.now).group_by(&:name)
+    all = Result.all.group_by(&:name)
+    @today_graph = []
+    @all_graph = []     
+    today.each{|k,v| @today_graph.append({name: k, data: v.every_nth(v.count/100+1).map{|r| [r[:created_at], r[:likes]]}.to_h })}
+    all  .each{|k,v| @all_graph  .append({name: k, data: v.every_nth(v.count/100+1).map{|r| [r[:created_at], r[:likes]]}.to_h })}
   end
 
 

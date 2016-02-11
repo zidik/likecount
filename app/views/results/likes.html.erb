@@ -3,5 +3,7 @@
 <%= javascript_include_tag "//www.google.com/jsapi", "chartkick" %>
 </head>
 <h1>Laigid</h1>
-<p id="notice"><%= notice %></p>
-<%= line_chart @graphs, min: 1800 %>
+<h2>Viimased 24h</h2>
+<%= line_chart @today_graph, min: nil %>
+<h2>Kogu periood</h2>
+<%= line_chart @all_graph %>
