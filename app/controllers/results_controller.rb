@@ -32,36 +32,87 @@ class ResultsController < ApplicationController
     results_today = Result.where(created_at: (Time.now - 1.day)..Time.now).group_by(&:name)
     results_all = Result.all.group_by(&:name)
 
-    def filtered data
-      nth = [data.count/100,1].max
-      data.every_nth(nth).map{|datapoint|
+
+    def filter_data data
+      data.map{|datapoint|
         [datapoint[:created_at], datapoint[:likes]]
       }.to_h
     end
 
-
-
-    @today_graph = results_today.map{ |name,data|
-      {
-        name: name,
-        data: filtered(data)
+    def filter_results results
+      results.map{ |name,data|
+        {
+          name: name,
+          data: filter_data(data)
+        }
       }
-    }
+    end
 
-    @all_graph = results_all .map{|name, data|
-      {
-        name: name,
-        data: filtered(data)
-      }
-    }
-    byebug
-    @today_delta_graph = @today_graph.map{|s| {name: s[:name], data: s[:data].zip(12.times.map{|i| [i,s[:data].values[0]]}.to_h.merge(s[:data])).map{|pair| [pair[0][0], pair[0][1]- ((pair[0][1] if pair[1][1].nil?) || pair[1][1])] }.to_h} }
-    @all_delta_graph = @all_graph.map{|s| {name: s[:name], data: s[:data].zip(12.times.map{|i| [i,s[:data].values[0]]}.to_h.merge(s[:data])).map{|pair| [pair[0][0], pair[0][1]- ((pair[0][1] if pair[1][1].nil?) || pair[1][1])] }.to_h} }
-    
-    @today_graph.sort_by! { |hsh| hsh[:name] }
-    @all_graph.sort_by! { |hsh| hsh[:name] }
-    @today_delta_graph.sort_by! { |hsh| hsh[:name] }
-    @all_delta_graph.sort_by! { |hsh| hsh[:name] }
+    def take_results count, results
+      nth = [results.values.map(&:count).max/count,1].max
+      results = results.map{ |name,data| [name, data.every_nth(nth)] }.to_h
+    end
+
+    def results_to_graph results
+      results = (take_results 100, results)
+      graph = filter_results results
+      graph
+    end
+
+    @today_graph = results_to_graph results_today
+    @all_graph = results_to_graph results_all
+
+    def shift_hash hash, count, padding_value
+      count
+          .times
+          .map{|i| [i, padding_value]}
+          .to_h
+          .merge(hash)
+    end
+
+
+
+    @today_delta_graph =
+        filter_results(results_today).map{ |s|
+          first_elem = s[:data].values[0]
+          {
+              name: s[:name],
+              data: s[:data]
+                        .zip(shift_hash s[:data], 12, first_elem)
+                        .map{|pair| [pair[0][0], pair[0][1]- pair[1][1]]}
+                        .to_h
+          }
+        }
+
+    @all_delta_graph =
+        filter_results(results_all).map{|s|
+          first_elem = s[:data].values[0]
+          {
+            name: s[:name],
+            data: s[:data]
+                      .zip(shift_hash s[:data], 12, first_elem)
+                      .map{|pair| [pair[0][0], pair[0][1]- pair[1][1]]}
+                      .to_h
+          }
+        }
+
+    def take_points count, graph
+
+      nth = [graph[0][:data].count/count,1].max
+      graph.map{ |h| {
+          name: h[:name],
+          data: (0... h[:data].length)
+                  .zip(h[:data]).select{|i, v| i%nth==0}.map(&:second).to_h
+      } }
+    end
+
+    @today_delta_graph = (take_points 100, @today_delta_graph)
+    @all_delta_graph = (take_points 100, @all_delta_graph)
+
+    @today_graph.sort_by! { |h| h[:name] }
+    @all_graph.sort_by! { |h| h[:name] }
+    @today_delta_graph.sort_by! { |h| h[:name] }
+    @all_delta_graph.sort_by! { |h| h[:name] }
   end
 
 
