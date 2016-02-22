@@ -1,16 +1,17 @@
 
 <head>
-<%= javascript_include_tag "//www.google.com/jsapi", "chartkick" %>
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<%= javascript_include_tag "http://code.highcharts.com/highcharts.js", "chartkick" %>
 </head>
 <h1>Laigid</h1>
 <h2>Viimased 24h</h2>
 <h3>Kumulatiivne</h3>
-<%= line_chart @today_graph, min: nil %>
+<%= line_chart @today_graph, xtitle: "Aeg", ytitle: "Laikide arv" %>
 <h3>Laike tunnis</h3>
-<%= line_chart @today_delta_graph %>
+<%= line_chart @today_delta_graph, xtitle: "Aeg", ytitle: "Laike tunnis" %>
 
 <h2>Kogu periood</h2>
 <h3>Kumulatiivne</h3>
-<%= line_chart @all_graph %>
+<%= line_chart @all_graph, xtitle: "Aeg", ytitle: "Laikide arv" %>
 <h3>Laike tunnis</h3>
-<%= line_chart @all_delta_graph %>
+<%= line_chart @all_delta_graph, xtitle: "Aeg", ytitle: "Laike tunnis"  %>
